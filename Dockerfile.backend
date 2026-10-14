@@ -1,0 +1,53 @@
+# ==============================================
+# Mak AI - Backend Dockerfile
+# Python FastAPI + Video Processing
+# ==============================================
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
+
+# Install system dependencies including FFmpeg
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ffmpeg \
+    libsm6 \
+    libxext6 \
+    libgl1-mesa-glx \
+    fonts-dejavu-core \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements first for caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir pydantic-settings argon2-cffi
+
+# Copy application code
+COPY backend/ ./backend/
+COPY core/ ./core/
+COPY video_engine/ ./video_engine/
+COPY cinematic_pipeline.py .
+COPY cinematic_masterpiece.py .
+COPY stock_videos.py .
+COPY video_effects.py .
+COPY api_usage_tracker.py .
+
+# Create necessary directories
+RUN mkdir -p out assets/bgm
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"
+
+# Run the application
+CMD ["python", "-m", "uvicorn", "backend.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,60 @@
+# Core
+python-dotenv==1.0.1
+openai==1.43.0
+tiktoken==0.7.0
+httpx<0.28.0
+
+# Video/Audio
+moviepy==1.0.3
+pydub==0.25.1
+Pillow==10.4.0
+imageio-ffmpeg>=0.4.9
+
+# Backend API
+fastapi==0.143.0
+starlette==1.8.0
+uvicorn>=0.32.0
+
+# Logging & utilities
+requests==2.34.2
+
+# Auth & Database
+sqlalchemy>=2.0.0
+aiosqlite>=0.19.0
+passlib[bcrypt]>=1.7.4
+PyJWT==2.15.1
+pydantic-settings>=2.0.0
+
+# =============================================================================
+# Multi-Model AI Providers (for intelligent routing)
+# =============================================================================
+anthropic>=0.18.0              # Claude - superior creative writing
+google-generativeai>=0.4.0     # Gemini - multimodal capabilities
+mistralai>=0.1.0               # Mistral - fast & cost-effective
+
+# =============================================================================
+# Enhanced Features
+# =============================================================================
+replicate>=0.25.0              # AI video generation (procedural B-roll)
+# elevenlabs>=0.2.0            # Voice cloning (optional, uncomment if needed)
+# deepl>=1.16.0                # Translation (optional, uncomment if needed)
+
+# =============================================================================
+# TrendJack Engine (Free APIs for viral content)
+# =============================================================================
+praw>=7.7.0                    # Reddit API (60 req/min free)
+pytrends>=4.9.0                # Google Trends (unlimited, free)
+# tweepy>=4.14.0               # Twitter API (optional, requires API key)
+
+# =============================================================================
+# Background Jobs & Async
+# =============================================================================
+aiofiles>=23.2.0               # Async file operations
+# celery>=5.3.0                # Task queue (optional, for scaling)
+# redis>=5.0.0                 # Cache/Queue backend (optional)
+
+# Explicit direct/runtime support previously missing or only installed in Docker.
+numpy
+python-multipart
+email-validator
+argon2-cffi

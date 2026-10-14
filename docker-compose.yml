@@ -1,0 +1,64 @@
+# ==============================================
+# Mak AI - Docker Compose
+# Complete deployment stack
+# ==============================================
+
+version: '3.8'
+
+services:
+  # Backend API + Video Processing
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: mak-ai-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PEXELS_API_KEY=${PEXELS_API_KEY:-}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:?Set a strong server-side JWT signing key}
+      - DATABASE_URL=sqlite+aiosqlite:////app/data/app_data.db
+      - ADMIN_BOOTSTRAP_EMAIL=${ADMIN_BOOTSTRAP_EMAIL:-}
+      - ADMIN_BOOTSTRAP_PASSWORD=${ADMIN_BOOTSTRAP_PASSWORD:-}
+      - ENABLE_ZAPIER_INTEGRATION=false
+      - DAILY_VIDEO_LIMIT=${DAILY_VIDEO_LIMIT:-2}
+    volumes:
+      - ./out:/app/out
+      - ./assets:/app/assets
+      - database_data:/app/data
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # Frontend (React + Nginx)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: mak-ai-frontend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "--spider", "http://localhost/" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  database_data:
+  output_data:
+  assets_data:
+
+
+networks:
+  default:
+    name: mak-ai-network
